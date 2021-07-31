@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+    stock_analyzer_server_flask:
+        container_name: stockAnalyzerServerFlask
+        image: raju6713/stock-analyzer-server_flask
+        build: .
+        ports:
+          - "1235:5000"
+        volumes:
+          - .:/code
+        environment:
+          - TZ=Asia/Kolkata
+        restart: unless-stopped
