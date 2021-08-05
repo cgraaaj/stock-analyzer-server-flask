@@ -29,11 +29,20 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 # which tells the application which URL should call 
 # the associated function.
 
+@app.route('/option_chain', methods = ['POST'])
+def option_chain():
+    expiry = request.args.get('expiry')
+    app.logger.info(f'analyzing data')
+    df = analyze_stock(expiry,request.json)
+    return df.to_json()
+
+
 @app.route('/download/<path:index>', methods=['POST'])
 def download(index):
-    analyze_stock(index,request.json)
+    expiry = request.args.get('expiry')
+    df = analyze_stock(expiry,request.json)
+    df.to_excel(f'{app.root_path}/data/{index}.xlsx')
     file_path = os.path.join(app.root_path, 'data', f'{index}.xlsx')
-    app.logger.info(f'{index} file is saved in {file_path}')
     @after_this_request
     def remove_file(res):
         if os.path.isfile(file_path):
@@ -43,13 +52,13 @@ def download(index):
     print(os.path.dirname(file_path),file_path)
     return send_from_directory(os.path.dirname(file_path),file_path, f'{index}.xlsx')
 
-@app.route('/uptrend/<path:date>', methods=['GET'])
-def getUptrend(date):
-    print(date)
+@app.route('/uptrend', methods=['GET'])
+def getUptrend():
+    app.logger.info(f'fetching data')
     db = get_database()
     collection = db["uptrend"]
     res = list(collection.find({},{ "_id": 0, "date": 1, "nifty": 1, "non_nifty":1},limit=7))
-    print(res)
+    app.logger.info(res)
     return jsonify(data=res)
     # return jsonify(data=json_util.dumps(res))
 

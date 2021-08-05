@@ -25,7 +25,7 @@ def oi_action_pe(row):
         return "Long Unwind"
 
 
-def analyze_stock(index,data):
+def analyze_stock(expiry,data):
     data_path = os.path.dirname(os.path.realpath(__file__))
     expiry_data = {}
     df_ce_pe = pd.DataFrame()
@@ -49,8 +49,8 @@ def analyze_stock(index,data):
         expiry_data[expiry_dt] = [
             d for d in data["data"] if expiry_dt in d["expiryDate"]
         ]
-    ce = [expd["CE"] for expd in expiry_data[expiry_dates[0]] if "CE" in expd.keys()]
-    pe = [expd["PE"] for expd in expiry_data[expiry_dates[0]] if "PE" in expd.keys()]
+    ce = [expd["CE"] for expd in expiry_data[expiry] if "CE" in expd.keys()]
+    pe = [expd["PE"] for expd in expiry_data[expiry] if "PE" in expd.keys()]
     df_ce = pd.DataFrame(ce)[
         [
             "openInterest",
@@ -93,4 +93,4 @@ def analyze_stock(index,data):
     columns.insert(len(df_ce_pe.columns) - 1, "Put OI Action")
     columns.insert(len(df_ce_pe.columns), "Put Trend")
     df_ce_pe = df_ce_pe[columns]
-    return df_ce_pe.to_excel(f'{data_path}/data/{index}.xlsx')
+    return df_ce_pe
